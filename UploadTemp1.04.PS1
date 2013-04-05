@@ -1,8 +1,10 @@
-# By David Mohorn - 07/04/2011
+# By Daniel Seveso 3/1/2013
+#
+# Built up on work by David Mohorn - 07/04/2011
 # This is a simple script that queries my 3M-50 Wi-Fi Thermostat and grabs the room temperature.
 # It also goes to Yahoo Weather and gets the outside temperature for my area.
 # This data is then posted to ThingSpeak.com.
-#
+
 
 # Version without the CPU temp for those machines that don't support it. 
 # TODO: include a switch for this variant. Done 4/2/2012 (-nocpu:$true)
@@ -10,33 +12,35 @@
 # TODO: How to launch @ startup as administrator
 # TODO: Check the thermostat returns a good value (not -1). Done 4/2/2013
 # TODO: Add target temp and if thermostat is turned on or not to the CSV file
+# TODO: Include a debug function
 
 
 # $nocpu will dictate if we include WMI to check on CPU temp using msacpi_thermalzonetemperature
 param($nocpu=$false)
 
 
-# Output stuff
+# Output file 
 $csvoutfile = "$env:COMPUTERNAME-myTemp.csv"
+$csvoutfilesize = 10000 #bytes
 $templineheader="Date,OutsideTemp,InsideTemp,CPUTemp,RawData"
+# Write header line each time the script restarts
 $templineheader | Add-Content -Path .\$csvoutfile
 
+# Output file size control and rename function
 function checkoutfile {
 Write-Output "Just checked the file..."
 $csvoutdate = Get-Date -Format "yymmddhhmmss"
 $csvoutsize = (Get-ChildItem .\$csvoutfile).Length
-if ($csvoutsize -ge 10000) {
+if ($csvoutsize -ge $csvoutfilesize) {
     Rename-Item .\$csvoutfile .\$env:COMPUTERNAME-myTemp-$csvoutdate.csv
     $templineheader | Add-Content -Path .\$csvoutfile
     }
 }
 
-
+# Main Loop
 while(1)
 {
    " "   
-   # "Time: {0}" -f (Get-Date -format G)
-  
    $tempdate = Get-Date -Format G
    "Time: $tempdate"
    
@@ -79,7 +83,7 @@ while(1)
    #$client = new-object net.webclient
    #$s = $client.DownloadString($url)
 
-  
+   # Sampling interval
    #Start-Sleep -s (60*5)
    Start-Sleep -s (5)
 }
