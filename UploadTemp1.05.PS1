@@ -19,12 +19,21 @@
 param($nocpu=$false,$logenabled=$false)
 
 
-# Output file 
+# Temperature Output file 
 $csvoutfile = "$env:COMPUTERNAME-myTemp.csv"
 $csvoutfilesize = 10000 #bytes
 $templineheader="Date,OutsideTemp,InsideTemp,CPUTemp,RawData"
 # Write header line each time the script restarts
 $templineheader | Add-Content -Path .\$csvoutfile
+
+
+# Log Output file 
+$logoutfile = "$env:COMPUTERNAME-myTemp.log"
+$logoutfilesize = 10000 #bytes
+$loglineheader="Date,OutsideTemp,InsideTemp,CPUTemp,RawData"
+# Write header line each time the script restarts
+$loglineheader | Add-Content -Path .\$logoutfile
+
 
 # Output file size control and rename function
 function checkoutfile ($file,$csvsizelimit) {
@@ -51,7 +60,8 @@ while(1)
          
    # 3M-50 temp
    do {
-    $url="http://192.168.1.76/tstat/"
+    #$url="http://192.168.1.76/tstat/"
+    $url="http://1.1.1.1/tstat/"
     $client = new-object net.webclient
     $s = $null
     #introducing delay to facilitate retries with the slow thermostat.

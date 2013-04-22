@@ -1,4 +1,5 @@
 # By Daniel Seveso 3/1/2013
+# Version 2 runs on PowerShell 3.0 only due to ConverFrom-Json change
 #
 # Built up on work by David Mohorn - 07/04/2011
 # This is a simple script that queries my 3M-50 Wi-Fi Thermostat and grabs the room temperature.
@@ -13,18 +14,28 @@
 # TODO: Check the thermostat returns a good value (not -1). Done 4/2/2013
 # TODO: Add target temp and if thermostat is turned on or not to the CSV file
 # TODO: Include a debug function
+# TODO: Include ConvertFrom-Json funtion on PS 3.0
 
 
 # $nocpu will dictate if we include WMI to check on CPU temp using msacpi_thermalzonetemperature
 param($nocpu=$false,$logenabled=$false)
 
 
-# Output file 
+# Temperature Output file 
 $csvoutfile = "$env:COMPUTERNAME-myTemp.csv"
 $csvoutfilesize = 10000 #bytes
 $templineheader="Date,OutsideTemp,InsideTemp,CPUTemp,RawData"
 # Write header line each time the script restarts
 $templineheader | Add-Content -Path .\$csvoutfile
+
+
+# Log Output file 
+$logoutfile = "$env:COMPUTERNAME-myTemp.log"
+$logoutfilesize = 10000 #bytes
+$loglineheader="Date,OutsideTemp,InsideTemp,CPUTemp,RawData"
+# Write header line each time the script restarts
+$loglineheader | Add-Content -Path .\$logoutfile
+
 
 # Output file size control and rename function
 function checkoutfile ($file,$csvsizelimit) {
@@ -50,20 +61,42 @@ while(1)
    "Yahoo outsideTemp = " + $outsideTemp
          
    # 3M-50 temp
+   # json output
+   # -----------
+   #  temp       Temperature
+   #  tmode      Thermostat operating mode 0: OFF 1: HEAT 2: COOL 3: AUTO
+   #  fmode      Fan operating mode 0: AUTO 1: AUTO/CIRCULATE 2: ON 
+   #  override   Override status 0: Override is disabled 1: Override is enabled. 
+   #             Note: Firmware versions prior to 1.04 can return any non-zero 
+   #  hold       Target temperature Hold status 0: Hold is disabled 1: Hold is enabled 
+   #  t_heat     
+   #  tstate     HVAC Operating State  0: OFF 1: HEAT 2: COOL 
+   #             Note: This functionality may not be available in all models
+   #  fstate     Fan Operating State 0: OFF 1: ON 
+   #             Note: Only available with CT-30
+   #  time       @{day=0; hour=7; minute=51}
+   #             JSON object with the following fields: day, hours, minutes.  day : Integer value representing the day of the week, with day 0 being Monday. hour : Integer value representing number of hours elapsed since midnight. minutes : Integer value representing number of minutes since start of the hour. 
+
+   #  t_type_post
+   #             Target Temperature POST type. Integer value that indicates whether a POST on t_heat/t_cool will result in temporary or absolute temperature change. 
+   #             0: Temporary Target Temperature 1: Absolute Target Temperature 2: Unknown 
+   #             This attribute is deprecated and will be obsoleted in future versions of the API
+
+
+
    do {
     $url="http://192.168.1.76/tstat/"
+    #$url="http://1.1.1.1/tstat/" #introduce error connecting to the thermostat
     $client = new-object net.webclient
     $s = $null
     #introducing delay to facilitate retries with the slow thermostat.
-    Start-Sleep -s (5)
+    # Start-Sleep -s (5)
     $s = $client.DownloadString($url)
-    $s
-    write-host "passed the connection statement"    
-    $hash = $s -replace '{|}|"' -replace ",","`n" -replace ":","=" | ConvertFrom-StringData
-    "Livingroom insideTemp = " + $hash["temp"]            
-    $insideTemp = $hash["temp"]  } 
-   #while ((!$s) -or ($insideTemp -eq -1))
-   while (($s) -or ($insideTemp -eq -1))
+    $tstatOutput = $s | ConvertFrom-Json
+    $insideTemp = $tstatOutput.temp
+    "Livingroom insideTemp = " + $insideTemp
+    }           
+   while ((!$s) -or ($insideTemp -eq -1))
    
 
 

@@ -1,0 +1,21 @@
+System.Management.Automation.CmdletInvocationException: Cannot process argument because the value of argument "path" is not valid. Change the value of the "path" argument and run the operation again. ---> System.Management.Automation.PSArgumentException: Cannot process argument because the value of argument "path" is not valid. Change the value of the "path" argument and run the operation again.
+   at Microsoft.PowerShell.Commands.FileSystemProvider.HasChildItems(String path)
+   at System.Management.Automation.LocationGlobber.GetChildNamesInDir(String dir, String leafElement, Boolean getAllContainers, CmdletProviderContext context, Boolean dirIsProviderPath, PSDriveInfo drive, ContainerCmdletProvider provider, String& modifiedDirPath)
+   at System.Management.Automation.LocationGlobber.GenerateNewPathsWithGlobLeaf(StringCollection currentDirs, String leafElement, Boolean isLastLeaf, ContainerCmdletProvider provider, CmdletProviderContext context)
+   at System.Management.Automation.LocationGlobber.ExpandGlobPath(String path, Boolean allowNonexistingPaths, ContainerCmdletProvider provider, CmdletProviderContext context)
+   at System.Management.Automation.LocationGlobber.GetGlobbedProviderPathsFromProviderPath(String path, Boolean allowNonexistingPaths, ContainerCmdletProvider containerProvider, CmdletProviderContext context)
+   at System.Management.Automation.LocationGlobber.ResolveProviderPathFromProviderPath(String providerPath, String providerId, Boolean allowNonexistingPaths, CmdletProviderContext context, CmdletProvider& providerInstance)
+   at System.Management.Automation.LocationGlobber.ResolvePSPathFromProviderPath(String path, CmdletProviderContext context, Boolean allowNonexistingPaths, Boolean isProviderDirectPath, Boolean isProviderQualifiedPath, CmdletProvider& providerInstance)
+   at System.Management.Automation.LocationGlobber.GetGlobbedMonadPathsFromMonadPath(String path, Boolean allowNonexistingPaths, CmdletProviderContext context, CmdletProvider& providerInstance)
+   at Microsoft.PowerShell.Commands.ResolvePathCommand.ProcessRecord()
+   at System.Management.Automation.CommandProcessor.ProcessRecord()
+   --- End of inner exception stack trace ---
+   at System.Management.Automation.Runspaces.PipelineBase.Invoke(IEnumerable input)
+   at System.Management.Automation.PowerShell.Worker.ConstructPipelineAndDoWork(Runspace rs, Boolean performSyncInvoke)
+   at System.Management.Automation.PowerShell.CoreInvokeHelper[TInput,TOutput](PSDataCollection`1 input, PSDataCollection`1 output, PSInvocationSettings settings)
+   at System.Management.Automation.PowerShell.CoreInvoke[TInput,TOutput](PSDataCollection`1 input, PSDataCollection`1 output, PSInvocationSettings settings)
+   at System.Management.Automation.PowerShell.CoreInvoke[TOutput](IEnumerable input, PSDataCollection`1 output, PSInvocationSettings settings)
+   at System.Management.Automation.PowerShell.Invoke(IEnumerable input, PSInvocationSettings settings)
+   at System.Management.Automation.CompletionExecutionHelper.ExecuteCurrentPowerShell(Exception& exceptionThrown, IEnumerable input)
+Exception calling "DownloadString" with "1" argument(s): "Unable to connect to the remote server"
+Exception calling "DownloadString" with "1" argument(s): "Unable to connect to the remote server"
